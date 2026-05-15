@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fixi + daisyUI + zs</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/fixi.js"></script>
+</head>
+<body class="min-h-screen bg-base-200">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-2">fixi + daisyUI + zs</h1>
+        <p class="text-base-content/70 mb-8">A minimal example using fixi, daisyUI, and the zs server.</p>
+
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h2 class="card-title">Click to load</h2>
+                <button class="btn btn-primary" fx-action="/hello" fx-target="#load-target" fx-swap="innerHTML">
+                    Load content
+                </button>
+                <div id="load-target" class="mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h2 class="card-title">POST request</h2>
+                <button class="btn btn-secondary" fx-action="/clicked" fx-method="post" fx-target="#post-target" fx-swap="innerHTML">
+                    Send POST
+                </button>
+                <div id="post-target" class="mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h2 class="card-title">Hover trigger</h2>
+                <button class="btn btn-accent" fx-action="/content" fx-trigger="mouseenter" fx-target="#trigger-target" fx-swap="innerHTML">
+                    Hover me
+                </button>
+                <div id="trigger-target" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
