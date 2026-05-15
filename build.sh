@@ -3,7 +3,7 @@ set -e
 
 if [ ! -f static/output.css ]; then
   echo "==> Generating CSS with Tailwind..."
-  ./tailwindcss --input static/app.css --output static/output.css
+  ./tailwindcss --minify --input static/app.css --output static/output.css
 fi
 
 echo "==> Building Zig binary..."

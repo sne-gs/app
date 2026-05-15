@@ -5,7 +5,7 @@ fuser -k 3000/tcp 2>/dev/null || true
 
 if [ ! -f static/output.css ]; then
   echo "==> Generating CSS (first build)..."
-  ./tailwindcss --input static/app.css --output static/output.css
+  ./tailwindcss --minify --input static/app.css --output static/output.css
 fi
 
 echo "==> Building..."
