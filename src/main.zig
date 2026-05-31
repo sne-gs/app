@@ -1,28 +1,13 @@
 const std = @import("std");
 const zs = @import("zs");
 
-const index_html = @embedFile("static/index.html");
-const output_css = @embedFile("static/output.css");
-
 const MyHandler = enum {
-    app,
-    style_css,
     hello,
 };
 
-fn appHandler(ctx: *zs.Context) zs.Response {
-    _ = ctx;
-    return zs.Response.init(.ok, index_html, "text/html");
-}
-
-fn styleCssHandler(ctx: *zs.Context) zs.Response {
-    _ = ctx;
-    return zs.Response.init(.ok, output_css, "text/css");
-}
-
 fn helloHandler(ctx: *zs.Context) zs.Response {
     _ = ctx;
-    return zs.Response.init(.ok, "<p class=\"text-lg text-success\">Hello, friend!</p>", "text/html");
+    return zs.Response.init(.ok, "Hello, World!", "text/html");
 }
 
 const MyDispatch = struct {
@@ -30,8 +15,6 @@ const MyDispatch = struct {
 
     pub fn dispatch(id: HandlerId, ctx: *zs.Context) ?zs.Response {
         return switch (id) {
-            .app => appHandler(ctx),
-            .style_css => styleCssHandler(ctx),
             .hello => helloHandler(ctx),
         };
     }
@@ -50,10 +33,8 @@ pub fn main() !void {
     var server = try ServerType.init(allocator);
     server.setHost("0.0.0.0");
     server.setPort(3000);
-    server.setIndex("static/index.html");
+    server.mapStaticAssets("static");
 
-    try server.addRoute(.GET, "/app", .app);
-    try server.addRoute(.GET, "/style.css", .style_css);
     try server.addRoute(.GET, "/hello", .hello);
 
     try server.start(io);

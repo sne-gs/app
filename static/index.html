@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>snegs</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/output.css" />
+    <link rel="stylesheet" href="/extra.css" />
     <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.1.1/moxi.js" integrity="sha256-FYiaQ07vplZsK/jRKPT0yhLByqgC8cTXwe8SyuRy1lE=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/fixi-js@0.9.4/fixi.js" integrity="sha256-rPuE58bCyMrZ37o4bByX4epgBA1bAeTylp7TxOXVh90=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/ssexi-js@0.0.1/ssexi.js" integrity="sha256-/Apa7x6OzOp7AwjUoGNlM7n1Rma98JB515fUeJ/yjrM=" crossorigin="anonymous"></script>
@@ -12,18 +13,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/rexi-js@0.0.1/rexi.js" integrity="sha256-cCEegdCXeB/kzcjjQ07v3ud2DUtKKhaCArdCI/mZAX4=" crossorigin="anonymous"></script>
 </head>
 <body class="min-h-screen bg-base-200">
-    <div class="container mx-auto p-8">
-        <h1 class="text-4xl font-bold mb-2">snegs</h1>
-        <p class="text-base-content/70 mb-8">always a lot of snegs</p>
-        <div class="card bg-base-100 shadow-xl mb-6">
-            <div class="card-body">
-                <h2 class="card-title">Say hello:</h2>
-                <button class="btn btn-primary" fx-action="/hello" fx-target="#load-target" fx-swap="innerHTML">
-                    Hello
-                </button>
-                <div id="load-target" class="mt-4"></div>
-            </div>
+    <div class="navbar bg-base-100 shadow-xl flex justify-between">
+        <div class="navbar-start">
+            <a href="/" class="flex items-center text-xl normal-case gap-4 px-4">
+                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 320 210"
+                     style="height: 22px; width: auto; display: inline-block; vertical-align: middle;">
+                    <rect width="100" height="100" x="-50" y="-50" fill="#b400ff" rx="0" ry="0" transform="translate(160 50)"/>
+                    <rect width="100" height="100" x="-50" y="-50" fill="#7800ff" rx="0" ry="0" transform="translate(270 50)"/>
+                    <rect width="100" height="100" x="-50" y="-50" fill="#f0f" rx="0" ry="0" transform="translate(160 160)"/>
+                    <rect width="100" height="100" x="-50" y="-50" fill="#ff0078" rx="0" ry="0" transform="translate(50 160)"/>
+                </svg>
+                <span class="logo">snegs</span>
+            </a>
         </div>
     </div>
+    <main class="container mx-auto p-8">
+        
+    </main>
 </body>
 </html>

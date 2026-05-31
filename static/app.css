@@ -4,5 +4,9 @@
 @source not "./daisyui{,*}.mjs";
 
 @plugin "./daisyui.mjs" {
-  include: ["button", "card"];
+  components: ["button", "card", "navbar"];
+}
+
+@theme {
+  --font-sans: 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
 }

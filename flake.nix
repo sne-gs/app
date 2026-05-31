@@ -18,6 +18,7 @@
           buildInputs = [
             zig
             pkgs.zls
+            pkgs.tailwindcss_4
           ];
 
           shellHook = ''
