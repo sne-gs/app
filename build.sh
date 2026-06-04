@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-echo "==> Building CSS"
-tailwindcss --minify --input static/app.css --output static/output.css
+echo "==> Building HTML"
+hugo -s ui --minify
 
-echo "==> Building Zig binary"
+echo "==> Building CSS"
+tailwindcss --minify --input ui/static/app.css --output ui/public/output.css
+
+echo "==> Building Zig"
 zig build "$@"
 
-echo "==> Done. Run ./zig-out/bin/app to start the server."
+echo "==> Build complete."
