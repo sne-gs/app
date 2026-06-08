@@ -1,8 +1,24 @@
 const std = @import("std");
 
-pub fn build(b: *std.Build) void {
+pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+
+    const hugo_cmd = b.addSystemCommand(&.{ "hugo", "-s", "ui", "--minify" });
+    try hugo_cmd.step.addWatchInput(b.path("ui/content"));
+    try hugo_cmd.step.addWatchInput(b.path("ui/layouts"));
+
+    const tailwind_cmd = b.addSystemCommand(&.{
+        "tailwindcss",
+        "-i",
+        "ui/static/app.css",
+        "-o",
+        "ui/public/dist.css",
+        "--minify",
+    });
+    try tailwind_cmd.step.addWatchInput(b.path("ui/static/app.css"));
+
+    tailwind_cmd.step.dependOn(&hugo_cmd.step);
 
     const zs_dep = b.dependency("zs", .{
         .target = target,
@@ -22,6 +38,8 @@ pub fn build(b: *std.Build) void {
         .name = "app",
         .root_module = root_mod,
     });
+
+    exe.step.dependOn(&tailwind_cmd.step);
 
     b.installArtifact(exe);
 
