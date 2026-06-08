@@ -1,76 +1,76 @@
 const std = @import("std");
 const zs = @import("zs");
-const zui = @import("zui.zig");
+const zh = @import("zh");
 
 pub const Action = enum {
     click,
     about_click,
 };
 
-fn buttonComponent(writer: *zui.FixedWriter, label: []const u8, action: Action) void {
+fn buttonComponent(writer: *zh.FixedWriter, label: []const u8, action: Action) void {
     var action_path_buf: [64]u8 = undefined;
     const action_path = std.fmt.bufPrint(&action_path_buf, "/_action/{s}", .{@tagName(action)}) catch "/_action/unknown";
-    const btn = zui.element(writer, "button", .{
+    const btn = zh.element(writer, "button", .{
         .hx_post = action_path,
         .hx_swap = "outerHTML",
     });
     defer btn.close();
-    zui.text(writer, label);
+    zh.text(writer, label);
 }
 
-fn appContent(writer: *zui.FixedWriter) void {
+fn appContent(writer: *zh.FixedWriter) void {
     {
-        const div = zui.element(writer, "div", .{ .class = "container" });
+        const div = zh.element(writer, "div", .{ .class = "container" });
         defer div.close();
         {
-            const span = zui.element(writer, "span", .{});
+            const span = zh.element(writer, "span", .{});
             defer span.close();
             buttonComponent(writer, "Hello!", .click);
         }
     }
 }
 
-fn renderPage(writer: *zui.FixedWriter) void {
+fn renderPage(writer: *zh.FixedWriter) void {
     writer.write("<!doctype html>");
     {
-        const html = zui.element(writer, "html", .{});
+        const html = zh.element(writer, "html", .{});
         defer html.close();
         {
-            const head = zui.element(writer, "head", .{});
+            const head = zh.element(writer, "head", .{});
             defer head.close();
-            const script = zui.element(writer, "script", .{ .src = "https://unpkg.com/htmx.org@2.0.2" });
+            const script = zh.element(writer, "script", .{ .src = "https://unpkg.com/htmx.org@2.0.2" });
             defer script.close();
         }
         {
-            const body = zui.element(writer, "body", .{});
+            const body = zh.element(writer, "body", .{});
             defer body.close();
             appContent(writer);
         }
     }
 }
 
-fn handleClick(writer: *zui.FixedWriter, allocator: std.mem.Allocator) void {
+fn handleClick(writer: *zh.FixedWriter, allocator: std.mem.Allocator) void {
     _ = allocator;
     {
-        const div = zui.element(writer, "div", .{ .class = "alert" });
+        const div = zh.element(writer, "div", .{ .class = "alert" });
         defer div.close();
-        zui.text(writer, "Clicked!");
+        zh.text(writer, "Clicked!");
     }
 }
 
-fn handleAboutClick(writer: *zui.FixedWriter, allocator: std.mem.Allocator) void {
+fn handleAboutClick(writer: *zh.FixedWriter, allocator: std.mem.Allocator) void {
     _ = allocator;
     {
-        const div = zui.element(writer, "div", .{ .class = "info" });
+        const div = zh.element(writer, "div", .{ .class = "info" });
         defer div.close();
-        zui.text(writer, "About page clicked");
+        zh.text(writer, "About page clicked");
     }
 }
 
 const baked = struct {
     pub const app_page: []const u8 = b: {
         var buf: [65536]u8 = undefined;
-        var writer = zui.FixedWriter{ .buffer = &buf };
+        var writer = zh.FixedWriter{ .buffer = &buf };
         renderPage(&writer);
         const final_html = buf[0..writer.pos].*;
         break :b &final_html;
@@ -78,7 +78,7 @@ const baked = struct {
 
     pub const click_fragment: []const u8 = b: {
         var buf: [4096]u8 = undefined;
-        var writer = zui.FixedWriter{ .buffer = &buf };
+        var writer = zh.FixedWriter{ .buffer = &buf };
         handleClick(&writer, undefined);
 
         const final_html = buf[0..writer.pos].*;
@@ -87,7 +87,7 @@ const baked = struct {
 
     pub const about_fragment: []const u8 = b: {
         var buf: [4096]u8 = undefined;
-        var writer = zui.FixedWriter{ .buffer = &buf };
+        var writer = zh.FixedWriter{ .buffer = &buf };
         handleAboutClick(&writer, undefined);
 
         const final_html = buf[0..writer.pos].*;

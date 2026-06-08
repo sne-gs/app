@@ -25,13 +25,16 @@ pub fn build(b: *std.Build) !void {
     });
     const zs_mod = zs_dep.module("zs");
 
+    const zh_dep = b.dependency("zh", .{
+        .target = target,
+    });
+    const zh_mod = zh_dep.module("zh");
+
     const root_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
-        .imports = &.{
-            .{ .name = "zs", .module = zs_mod },
-        },
+        .imports = &.{ .{ .name = "zs", .module = zs_mod }, .{ .name = "zh", .module = zh_mod } },
     });
 
     const exe = b.addExecutable(.{
