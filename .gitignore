@@ -1,5 +1,11 @@
 .zig-cache/
 zig-out/
+zig-pkg
 .direnv/
+
+*.db
+*.db-journal
+
+.env
 
 tailwindcss
