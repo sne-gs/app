@@ -15,10 +15,8 @@ const TodoApp = struct {
     fn renderList(self: *const TodoApp, writer: *zh.FixedWriter) !void {
         var stmt = try self.db.prepare(struct {}, Todo, "SELECT id, title, completed FROM todos ORDER BY id DESC");
         defer stmt.finalize();
-
         const div = zh.element(writer, "div", .{ .class = "todo-list" });
         defer div.close();
-
         while (try stmt.step()) |row| {
             try self.renderTodoItem(writer, row);
         }
@@ -30,11 +28,9 @@ const TodoApp = struct {
         const title = row.title.data;
         const todo_div = zh.element(writer, "div", .{ .class = if (completed) "todo completed" else "todo" });
         defer todo_div.close();
-
         var toggle_url_buf: [64]u8 = undefined;
         const new_completed = if (completed) "false" else "true";
         const toggle_url = try std.fmt.bufPrint(&toggle_url_buf, "/toggle/{d}?completed={s}", .{ row.id, new_completed });
-
         const checkbox = zh.element(writer, "input", .{
             .type = "checkbox",
             .hx_post = toggle_url,
@@ -43,9 +39,7 @@ const TodoApp = struct {
             .checked = if (completed) "checked" else null,
         });
         defer checkbox.close();
-
         zh.text(writer, title);
-
         var delete_url_buf: [64]u8 = undefined;
         const delete_url = try std.fmt.bufPrint(&delete_url_buf, "/delete?id={d}", .{row.id});
         const del = zh.element(writer, "button", .{
@@ -65,10 +59,8 @@ const TodoApp = struct {
             .hx_swap = "innerHTML",
         });
         defer form.close();
-
-        const input = zh.element(writer, "input", .{ .type = "text", .name = "title", .placeholder = "Add a new todo…" });
+        const input = zh.element(writer, "input", .{ .type = "text", .name = "title", .placeholder = "Add a new todo..." });
         defer input.close();
-
         const button = zh.element(writer, "button", .{ .type = "submit" });
         defer button.close();
         zh.text(writer, "Add");
@@ -81,24 +73,20 @@ const TodoApp = struct {
         const id = std.fmt.parseInt(i64, id_str, 10) catch {
             return zs.Response.init(.bad_request, "Invalid id", "text/plain");
         };
-
         const completed_str = ctx.request.query.get("completed") orelse {
             return zs.Response.init(.bad_request, "Missing completed status", "text/plain");
         };
         const completed = std.mem.eql(u8, completed_str, "true");
-
         const UpdateParams = struct { id: i64, completed: i64 };
         try self.db.exec("UPDATE todos SET completed = :completed WHERE id = :id", UpdateParams{
             .id = id,
             .completed = if (completed) 1 else 0,
         });
-
         var stmt = try self.db.prepare(struct { id: i64 }, Todo, "SELECT id, title, completed FROM todos WHERE id = :id");
         defer stmt.finalize();
         try stmt.bind(.{ .id = id });
         const row_opt = try stmt.step();
         const row = row_opt orelse return zs.Response.init(.not_found, "Todo not found", "text/plain");
-
         var out_buf: [4096]u8 = undefined;
         var writer = zh.FixedWriter{ .buffer = &out_buf };
         try self.renderTodoItem(&writer, row);
@@ -111,11 +99,9 @@ const TodoApp = struct {
         const title = title_opt orelse {
             return zs.Response.init(.bad_request, "Missing title", "text/plain; charset=utf-8");
         };
-
         const Params = struct { title: sl.Text };
         const params = Params{ .title = .{ .data = title } };
         try self.db.exec("INSERT INTO todos (title) VALUES (:title)", params);
-
         var out_buf: [4096]u8 = undefined;
         var writer = zh.FixedWriter{ .buffer = &out_buf };
         try self.renderList(&writer);
@@ -129,7 +115,6 @@ const TodoApp = struct {
         const id = std.fmt.parseInt(i64, id_str, 10) catch {
             return zs.Response.init(.bad_request, "Invalid id", "text/plain");
         };
-
         const Params = struct { id: i64 };
         try self.db.exec("DELETE FROM todos WHERE id = :id", Params{ .id = id });
         return zs.Response.init(.ok, "", "text/html");
@@ -169,7 +154,6 @@ const Handler = enum {
 
 const Dispatch = struct {
     pub const HandlerId = Handler;
-
     pub fn dispatch(id: HandlerId, ctx: *zs.Context(TodoApp)) ?zs.Response {
         return switch (id) {
             .root => ctx.env.rootHandler(ctx) catch |err| {
@@ -202,7 +186,6 @@ const routes = [_]zs.Route(Handler){
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
     const args = try init.minimal.args.toSlice(allocator);
-
     var port: u16 = 3030;
     var i: usize = 1;
     while (i < args.len) : (i += 1) {
@@ -216,16 +199,12 @@ pub fn main(init: std.process.Init) !void {
             }
         }
     }
-
     var threaded = std.Io.Threaded.init(allocator, .{});
     defer threaded.deinit();
     const io = threaded.io();
-
     var db = try sl.Database.open(.{ .path = "todos.db" });
     defer db.close();
-
     try db.exec("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0)", .{});
-
     const app = TodoApp{ .db = &db };
     const ServerType = zs.Server(Dispatch, TodoApp, &routes);
     var server = ServerType.init(app);
