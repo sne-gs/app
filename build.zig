@@ -20,6 +20,9 @@ pub fn build(b: *std.Build) !void {
 
     tailwind_cmd.step.dependOn(&hugo_cmd.step);
 
+    const sqlite = b.dependency("sqlite", .{});
+    const sqlite_mod = sqlite.module("sqlite");
+
     const zs_dep = b.dependency("zs", .{
         .target = target,
     });
@@ -34,7 +37,11 @@ pub fn build(b: *std.Build) !void {
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
-        .imports = &.{ .{ .name = "zs", .module = zs_mod }, .{ .name = "zh", .module = zh_mod } },
+        .imports = &.{
+            .{ .name = "zs", .module = zs_mod },
+            .{ .name = "zh", .module = zh_mod },
+            .{ .name = "sqlite", .module = sqlite_mod },
+        },
     });
 
     const exe = b.addExecutable(.{

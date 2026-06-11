@@ -17,5 +17,9 @@
             .path = "../zs",
         },
         .zh = .{ .path = "../zh" },
+        .sqlite = .{
+            .url = "https://github.com/nDimensional/zig-sqlite/archive/refs/tags/v0.4.0-3530100.tar.gz",
+            .hash = "sqlite-0.4.0-3530100-djiKTqCBAABomylmlMLWtzm9bE_8NQ1O7qVu6l9x6aP1",
+        },
     },
 }

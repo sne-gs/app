@@ -1,5 +1,5 @@
 {
-  description = "fixi + daisyUI + zs app";
+  description = "app";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -18,7 +18,7 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        zig = zig-overlay.packages.${system}.master;
+        zig = zig-overlay.packages.${system}."0.16.0";
       in
       {
         devShells.default = pkgs.mkShell {
