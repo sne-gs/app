@@ -21,5 +21,9 @@
             .url = "https://github.com/nDimensional/zig-sqlite/archive/refs/tags/v0.4.0-3530100.tar.gz",
             .hash = "sqlite-0.4.0-3530100-djiKTqCBAABomylmlMLWtzm9bE_8NQ1O7qVu6l9x6aP1",
         },
+        .zio = .{
+            .url = "git+https://github.com/lalinsky/zio?ref=v0.14.0#aa860381beb42bc077e24ef304827cbdc23fcef9",
+            .hash = "zio-0.14.0-xHbVVPxFHgBCop4CvfF4u360kzWlHD4FS8Ud-RIkPcZ7",
+        },
     },
 }

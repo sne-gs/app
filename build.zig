@@ -20,6 +20,12 @@ pub fn build(b: *std.Build) !void {
 
     tailwind_cmd.step.dependOn(&hugo_cmd.step);
 
+    const zio = b.dependency("zio", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    const zio_mod = zio.module("zio");
+
     const sqlite = b.dependency("sqlite", .{});
     const sqlite_mod = sqlite.module("sqlite");
 
@@ -38,9 +44,10 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
+            .{ .name = "sqlite", .module = sqlite_mod },
+            .{ .name = "zio", .module = zio_mod },
             .{ .name = "zs", .module = zs_mod },
             .{ .name = "zh", .module = zh_mod },
-            .{ .name = "sqlite", .module = sqlite_mod },
         },
     });
 

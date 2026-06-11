@@ -2,6 +2,7 @@ const std = @import("std");
 const zs = @import("zs");
 const zh = @import("zh");
 const sl = @import("sqlite");
+const zio = @import("zio");
 
 const Todo = struct {
     id: i64,
@@ -199,9 +200,9 @@ pub fn main(init: std.process.Init) !void {
             }
         }
     }
-    var threaded = std.Io.Threaded.init(allocator, .{});
-    defer threaded.deinit();
-    const io = threaded.io();
+    const rt = try zio.Runtime.init(std.heap.smp_allocator, .{});
+    defer rt.deinit();
+    const io = rt.io();
     var db = try sl.Database.open(.{ .path = "todos.db" });
     defer db.close();
     try db.exec("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0)", .{});
@@ -210,5 +211,8 @@ pub fn main(init: std.process.Init) !void {
     var server = ServerType.init(app);
     server.setHost("0.0.0.0");
     server.setPort(port);
-    try server.start(io);
+    var group: std.Io.Group = .init;
+    defer group.cancel(io);
+    try server.start(io, &group);
+    try group.await(io);
 }
