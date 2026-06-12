@@ -16,7 +16,7 @@ const TodoApp = struct {
     fn renderList(self: *const TodoApp, writer: *zh.FixedWriter) !void {
         var stmt = try self.db.prepare(struct {}, Todo, "SELECT id, title, completed FROM todos ORDER BY id DESC");
         defer stmt.finalize();
-        const div = zh.element(writer, "div", .{ .class = "todo-list" });
+        const div = zh.element(writer, "div", .{ .class = "space-y-2" });
         defer div.close();
         while (try stmt.step()) |row| {
             try self.renderTodoItem(writer, row);
@@ -27,42 +27,68 @@ const TodoApp = struct {
         _ = self;
         const completed = row.completed != 0;
         const title = row.title.data;
-        const todo_div = zh.element(writer, "div", .{ .class = if (completed) "todo completed" else "todo" });
-        defer todo_div.close();
-        var toggle_url_buf: [64]u8 = undefined;
-        const new_completed = if (completed) "false" else "true";
-        const toggle_url = try std.fmt.bufPrint(&toggle_url_buf, "/toggle/{d}?completed={s}", .{ row.id, new_completed });
-        const checkbox = zh.element(writer, "input", .{
-            .type = "checkbox",
-            .hx_post = toggle_url,
-            .hx_target = "closest .todo",
-            .hx_swap = "outerHTML",
-            .checked = if (completed) "checked" else null,
-        });
-        defer checkbox.close();
-        zh.text(writer, title);
-        var delete_url_buf: [64]u8 = undefined;
-        const delete_url = try std.fmt.bufPrint(&delete_url_buf, "/delete?id={d}", .{row.id});
-        const del = zh.element(writer, "button", .{
-            .hx_delete = delete_url,
-            .hx_target = "closest .todo",
-            .hx_swap = "outerHTML",
-        });
-        defer del.close();
-        zh.text(writer, "Delete");
+        {
+            var class_buf: [128]u8 = undefined;
+            const base = "todo flex items-center gap-3 p-3 bg-base-100 rounded-lg shadow-sm border border-base-200";
+            const class_str = if (completed)
+                try std.fmt.bufPrint(&class_buf, "{s} opacity-75", .{base})
+            else
+                base;
+            const todo_div = zh.element(writer, "div", .{ .class = class_str });
+            {
+                var toggle_url_buf: [64]u8 = undefined;
+                const new_completed = if (completed) "false" else "true";
+                const toggle_url = try std.fmt.bufPrint(&toggle_url_buf, "/toggle/{d}?completed={s}", .{ row.id, new_completed });
+                _ = zh.element(writer, "input", .{
+                    .type = "checkbox",
+                    .class = "checkbox checkbox-primary checkbox-sm",
+                    .hx_post = toggle_url,
+                    .hx_target = "closest .todo",
+                    .hx_swap = "outerHTML",
+                    .checked = if (completed) "checked" else null,
+                });
+            }
+            {
+                const span_class = if (completed) "flex-1 line-through text-gray-500" else "flex-1";
+                const title_span = zh.element(writer, "span", .{ .class = span_class });
+                zh.text(writer, title);
+                title_span.close();
+            }
+            {
+                var delete_url_buf: [64]u8 = undefined;
+                const delete_url = try std.fmt.bufPrint(&delete_url_buf, "/delete?id={d}", .{row.id});
+                const del_button = zh.element(writer, "button", .{
+                    .class = "btn btn-error btn-xs",
+                    .hx_delete = delete_url,
+                    .hx_target = "closest .todo",
+                    .hx_swap = "outerHTML",
+                });
+                zh.text(writer, "Delete");
+                del_button.close();
+            }
+            todo_div.close();
+        }
     }
 
     fn renderAdd(self: *const TodoApp, writer: *zh.FixedWriter) void {
         _ = self;
         const form = zh.element(writer, "form", .{
+            .class = "flex gap-2 mt-4",
             .hx_post = "/add",
             .hx_target = ".todo-list",
             .hx_swap = "innerHTML",
         });
         defer form.close();
-        const input = zh.element(writer, "input", .{ .type = "text", .name = "title", .placeholder = "Add a new todo..." });
-        defer input.close();
-        const button = zh.element(writer, "button", .{ .type = "submit" });
+        _ = zh.element(writer, "input", .{
+            .type = "text",
+            .name = "title",
+            .class = "input input-bordered flex-grow",
+            .placeholder = "Add a new todo...",
+        });
+        const button = zh.element(writer, "button", .{
+            .type = "submit",
+            .class = "btn btn-primary",
+        });
         defer button.close();
         zh.text(writer, "Add");
     }
@@ -123,18 +149,57 @@ const TodoApp = struct {
 
     pub fn renderRoot(self: *const TodoApp, writer: *zh.FixedWriter) !void {
         writer.write("<!doctype html>");
-        const html = zh.element(writer, "html", .{});
-        defer html.close();
+        const html = zh.element(writer, "html", .{ .class = "h-full" });
         {
             const head = zh.element(writer, "head", .{});
-            defer head.close();
-            const script = zh.element(writer, "script", .{ .src = "https://unpkg.com/htmx.org@2.0.2" });
-            defer script.close();
+            _ = zh.element(writer, "meta", .{ .name = "viewport", .content = "width=device-width, initial-scale=1" });
+            const tailwind = zh.element(writer, "script", .{ .src = "https://cdn.tailwindcss.com" });
+            tailwind.close();
+            _ = zh.element(writer, "link", .{ .href = "https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.css", .rel = "stylesheet" });
+            const htmx = zh.element(writer, "script", .{ .src = "https://unpkg.com/htmx.org@2.0.2" });
+            htmx.close();
+            head.close();
         }
-        const body = zh.element(writer, "body", .{});
-        defer body.close();
-        try self.renderList(writer);
-        self.renderAdd(writer);
+        {
+            const body = zh.element(writer, "body", .{ .class = "bg-base-200 p-4 min-h-full" });
+            {
+                const container = zh.element(writer, "div", .{ .class = "max-w-2xl mx-auto" });
+                {
+                    const title = zh.element(writer, "h1", .{ .class = "text-3xl mb-4" });
+                    zh.text(writer, "hi there");
+                    title.close();
+                    const subtitle = zh.element(writer, "p", .{ .class = "mb-3" });
+                    zh.text(writer, "here's a todo app");
+                    subtitle.close();
+                    const card = zh.element(writer, "div", .{ .class = "card bg-base-100 shadow-xl" });
+                    {
+                        const card_body = zh.element(writer, "div", .{ .class = "card-body" });
+                        {
+                            const h1 = zh.element(writer, "h1", .{ .class = "card-title text-2xl mb-4 text-center w-full justify-center" });
+                            zh.text(writer, "Todo App");
+                            h1.close();
+                        }
+                        {
+                            const list_div = zh.element(writer, "div", .{ .class = "todo-list" });
+                            try self.renderList(writer);
+                            list_div.close();
+                        }
+                        self.renderAdd(writer);
+                        card_body.close();
+                    }
+                    card.close();
+                    const description = zh.element(writer, "p", .{ .class = "my-4" });
+                    zh.text(writer, "it's written in zig, here's the source code:");
+                    description.close();
+                    const link = zh.element(writer, "a", .{ .class = "link link-primary", .href = "https://codeberg.org/snegs/app/src/branch/main/src/main.zig" });
+                    zh.text(writer, "link");
+                    link.close();
+                }
+                container.close();
+            }
+            body.close();
+        }
+        html.close();
     }
 
     pub fn rootHandler(self: *const TodoApp, ctx: *zs.Context(TodoApp)) !zs.Response {
@@ -187,7 +252,7 @@ const routes = [_]zs.Route(Handler){
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
     const args = try init.minimal.args.toSlice(allocator);
-    var port: u16 = 3030;
+    var port: u16 = 3000;
     var i: usize = 1;
     while (i < args.len) : (i += 1) {
         if (std.mem.eql(u8, args[i], "--port")) {
