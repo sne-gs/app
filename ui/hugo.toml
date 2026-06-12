@@ -1,4 +1,0 @@
-baseURL = 'https://sne.gs/'
-locale = 'en-us'
-title = 'Snegs'
-disableKinds = ["taxonomy", "term", "RSS", "sitemap"]
