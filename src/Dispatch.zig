@@ -7,23 +7,15 @@ pub const Dispatch = struct {
     pub const HandlerId = Handler;
 
     pub fn dispatch(id: HandlerId, ctx: *zs.Context(App)) ?zs.Response {
+        std.log.debug("🎯 Dispatching handler: {any}", .{id}); // <-- LOG 1
         return switch (id) {
-            .root => ctx.env.rootHandler(ctx) catch |err| {
-                std.log.err("root error: {}\n", .{err});
-                return zs.Response.init(.internal_server_error, "Internal Error", "text/html");
-            },
-            .add => ctx.env.addHandler(ctx) catch |err| {
-                std.log.err("add error: {}\n", .{err});
-                return zs.Response.init(.internal_server_error, "Internal Error", "text/html");
-            },
-            .delete => ctx.env.deleteHandler(ctx) catch |err| {
-                std.log.err("delete error: {}\n", .{err});
-                return zs.Response.init(.internal_server_error, "Internal Error", "text/html");
-            },
-            .toggle => ctx.env.toggleHandler(ctx) catch |err| {
-                std.log.err("toggle error: {}\n", .{err});
-                return zs.Response.init(.internal_server_error, "Internal Error", "text/html");
-            },
+            .root => ctx.env.rootHandler(ctx),
+            .add => ctx.env.addHandler(ctx),
+            .delete => ctx.env.deleteHandler(ctx),
+            .toggle => ctx.env.toggleHandler(ctx),
+        } catch |err| {
+            std.log.err("Handler execution failed: {any}", .{err});
+            return null;
         };
     }
 };

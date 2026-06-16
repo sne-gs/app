@@ -43,7 +43,7 @@ pub const TodoItem = struct {
 
         {
             var delete_url_buf: [64]u8 = undefined;
-            const delete_url = try std.fmt.bufPrint(&delete_url_buf, "/delete?id={d}", .{self.todo.id});
+            const delete_url = try std.fmt.bufPrint(&delete_url_buf, "/delete/{d}", .{self.todo.id});
             const del_button = zh.element(writer, "button", .{
                 .class = "btn btn-error btn-xs",
                 .hx_delete = delete_url,
