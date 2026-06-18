@@ -9,7 +9,7 @@ const routes = @import("routes.zig").routes;
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
     const args = try init.minimal.args.toSlice(allocator);
-    var port: u16 = 3558;
+    var port: u16 = 3000;
     var i: usize = 1;
     while (i < args.len) : (i += 1) {
         if (std.mem.eql(u8, args[i], "--port")) {
@@ -22,8 +22,8 @@ pub fn main(init: std.process.Init) !void {
             }
         }
     }
-    const rt = try zio.Runtime.init(std.heap.smp_allocator, .{
-        .executors = @enumFromInt(10),
+    const rt = try zio.Runtime.init(allocator, .{
+        .executors = @enumFromInt(8),
     });
     defer rt.deinit();
     const io = rt.io();
@@ -32,7 +32,7 @@ pub fn main(init: std.process.Init) !void {
     try db.exec("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0)", .{});
     const app = App{ .db = &db, .allocator = allocator };
     const ServerType = zs.Server(Pipe, App, &routes);
-    var server = try ServerType.init(app);
+    var server = try ServerType.init(app, allocator);
     server.setHost("0.0.0.0");
     server.setPort(port);
     var group: std.Io.Group = .init;
