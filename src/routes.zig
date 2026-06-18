@@ -1,9 +1,9 @@
 const zs = @import("zs");
-const Handler = @import("Handler.zig").Handler;
+const HandlerId = @import("Handler.zig").HandlerId;
 
-pub const routes = [_]zs.Route(Handler){
-    .{ .method = .GET, .path = "/", .handler = .root },
-    .{ .method = .POST, .path = "/add", .handler = .add },
-    .{ .method = .DELETE, .path = "/delete/{id}", .handler = .delete },
-    .{ .method = .POST, .path = "/toggle/{id}", .handler = .toggle },
+pub const routes = [_]zs.Route(HandlerId){
+    .{ .method = .GET, .path = "/", .handler = .{ .global = .root } },
+    .{ .method = .POST, .path = "/add", .handler = .{ .global = .add } },
+    .{ .method = .DELETE, .path = "/delete/{id}", .handler = .{ .global = .delete } },
+    .{ .method = .POST, .path = "/toggle/{id}", .handler = .{ .global = .toggle } },
 };

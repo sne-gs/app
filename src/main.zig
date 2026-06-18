@@ -3,7 +3,7 @@ const sl = @import("sqlite");
 const zio = @import("zio");
 const zs = @import("zs");
 const App = @import("App.zig").App;
-const Dispatch = @import("Dispatch.zig").Dispatch;
+const Pipe = @import("Dispatch.zig").Pipe;
 const routes = @import("routes.zig").routes;
 
 pub fn main(init: std.process.Init) !void {
@@ -31,8 +31,8 @@ pub fn main(init: std.process.Init) !void {
     defer db.close();
     try db.exec("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, completed INTEGER NOT NULL DEFAULT 0)", .{});
     const app = App{ .db = &db, .allocator = allocator };
-    const ServerType = zs.Server(Dispatch, App, &routes);
-    var server = try ServerType.init(app, allocator);
+    const ServerType = zs.Server(Pipe, App, &routes);
+    var server = try ServerType.init(app);
     server.setHost("0.0.0.0");
     server.setPort(port);
     var group: std.Io.Group = .init;

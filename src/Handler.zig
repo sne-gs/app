@@ -4,3 +4,7 @@ pub const Handler = enum {
     delete,
     toggle,
 };
+
+pub const HandlerId = union(enum) {
+    global: Handler,
+};

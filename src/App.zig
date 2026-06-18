@@ -10,7 +10,7 @@ pub const App = struct {
     db: *sl.Database,
     allocator: std.mem.Allocator,
 
-    pub fn toggleHandler(self: *const App, ctx: *zs.Context(App)) !zs.Response {
+    pub fn toggleHandler(self: *const App, ctx: *zs.Context(App, void)) !zs.Response {
         const id_str = ctx.req.params.get("id") orelse return zs.Response.badRequest("Missing id");
         const id = std.fmt.parseInt(i64, id_str, 10) catch return zs.Response.badRequest("Invalid id");
         const completed_str = ctx.req.query.get("completed") orelse return zs.Response.badRequest("Missing completed status");
@@ -32,7 +32,7 @@ pub const App = struct {
         return zs.Response.html(writer.buffer[0..writer.pos]);
     }
 
-    pub fn addHandler(self: *const App, ctx: *zs.Context(App)) !zs.Response {
+    pub fn addHandler(self: *const App, ctx: *zs.Context(App, void)) !zs.Response {
         var title_buf: [1024]u8 = undefined;
         const cl_str = ctx.req.headers.get("content-length") orelse return zs.Response.badRequest("Missing Content-Length");
         const content_length = try std.fmt.parseInt(usize, cl_str, 10);
@@ -51,7 +51,7 @@ pub const App = struct {
         return zs.Response.html(writer.buffer[0..writer.pos]);
     }
 
-    pub fn deleteHandler(self: *const App, ctx: *zs.Context(App)) !zs.Response {
+    pub fn deleteHandler(self: *const App, ctx: *zs.Context(App, void)) !zs.Response {
         const id_str = ctx.req.params.get("id") orelse return zs.Response.badRequest("Missing id");
         const id = std.fmt.parseInt(i64, id_str, 10) catch return zs.Response.badRequest("Invalid id");
         const Params = struct { id: i64 };
@@ -59,7 +59,7 @@ pub const App = struct {
         return zs.Response.text("");
     }
 
-    pub fn rootHandler(self: *const App, ctx: *zs.Context(App)) !zs.Response {
+    pub fn rootHandler(self: *const App, ctx: *zs.Context(App, void)) !zs.Response {
         _ = ctx;
         var buf: [65536]u8 = undefined;
         var writer = zh.FixedWriter{ .buffer = &buf };
