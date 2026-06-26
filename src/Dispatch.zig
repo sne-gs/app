@@ -12,7 +12,7 @@ pub const Dispatch = struct {
             .toggle => ctx.env.toggleHandler(ctx),
         } catch |err| {
             std.log.err("Handler execution failed: {any}", .{err});
-            return zs.Response.notFound();
+            return zs.Response.status(.not_found).static("404 Not found.");
         };
     }
 };
